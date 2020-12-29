@@ -107,6 +107,7 @@ class TaskEmail(CalibreTask):
         self.recipent = recipient
         self.text = text
         self.asyncSMTP = None
+        self.bookname = taskMessage[3:]+'.'+attachment.split('.')[-1]
 
         self.results = dict()
 
@@ -119,7 +120,7 @@ class TaskEmail(CalibreTask):
         text = self.text
         msg.attach(MIMEText(text.encode('UTF-8'), 'plain', 'UTF-8'))
         if self.attachment:
-            result = self._get_attachment(self.filepath, self.attachment)
+            result = self._get_attachment(self.filepath, self.attachment,self.bookname)
             if result:
                 msg.attach(result)
             else:
@@ -203,7 +204,7 @@ class TaskEmail(CalibreTask):
 
 
     @classmethod
-    def _get_attachment(cls, bookpath, filename):
+    def _get_attachment(cls, bookpath, filename,bookname=''):
         """Get file as MIMEBase message"""
         calibrepath = config.config_calibre_dir
         if config.config_use_google_drive:
@@ -233,7 +234,7 @@ class TaskEmail(CalibreTask):
         attachment.set_payload(data)
         encoders.encode_base64(attachment)
         attachment.add_header('Content-Disposition', 'attachment',
-                              filename=filename)
+                              filename=bookname)
         return attachment
 
     @property
